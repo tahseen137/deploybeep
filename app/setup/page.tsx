@@ -1,3 +1,5 @@
+'use client';
+
 export default function Setup() {
   const webhookBaseUrl = "https://deploybeep.vercel.app/api/webhook";
   
