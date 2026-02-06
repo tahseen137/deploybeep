@@ -1,41 +1,33 @@
 # 🔔 DeployBeep
 
-**Instant deployment notifications for Vercel, Netlify, and Railway.**
+**Never miss a deploy.**
 
-Never miss a deployment again. Get beautiful, instant notifications in Slack, Discord, or Email when your deployments succeed or fail.
+DeployBeep sends instant Slack, Discord, and Email notifications when your Vercel, Netlify, or Railway deployments succeed or fail. Know what's shipping before your users do.
 
-## 🚀 Features
+![Screenshot](screenshot.png)
 
-- **Multi-Platform Support**: Works with Vercel, Netlify, Railway, and any webhook-enabled platform
-- **Multiple Channels**: Send notifications to Slack, Discord, and Email
-- **Beautiful Formatting**: Clean, readable messages with status, branch, duration, and more
-- **Zero Storage**: Stateless architecture - your data never touches our servers
-- **Lightning Fast**: Notifications arrive within seconds of deployment completion
+## Features
 
-## 📦 Tech Stack
+- ⚡ **Instant Delivery** — Notifications arrive within seconds
+- 🎨 **Beautiful Formatting** — Clean messages with status, branch, duration
+- 🔒 **Zero Storage** — Stateless architecture, your data never touches our servers
+- 🚀 **Multi-Platform** — Works with Vercel, Netlify, Railway, and any webhook-enabled platform
+- 📱 **Multiple Channels** — Slack, Discord, and Email support
 
-- **Next.js 14** (App Router)
-- **Tailwind CSS** (Dark mode + glass morphism design)
-- **TypeScript**
-- **Vercel** (Hosting)
+## Tech Stack
 
-## 🎯 Quick Start
+- **Framework:** Next.js 14
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **Deployment:** Vercel
 
-1. **Get your webhook URL** from [deploybeep.vercel.app/setup](https://deploybeep.vercel.app/setup)
-2. **Add webhook** to your deployment platform (Vercel/Netlify/Railway)
-3. **Configure notifications** by adding query parameters:
-   - Slack: `?slack=YOUR_SLACK_WEBHOOK_URL`
-   - Discord: `?discord=YOUR_DISCORD_WEBHOOK_URL`
-   - Email: `?email=YOUR_EMAIL`
-
-Example:
-```
-https://deploybeep.vercel.app/api/webhook/vercel?slack=https://hooks.slack.com/services/YOUR/WEBHOOK/HERE
-```
-
-## 🛠️ Development
+## Getting Started
 
 ```bash
+# Clone the repository
+git clone https://github.com/yourusername/deploybeep.git
+cd deploybeep
+
 # Install dependencies
 npm install
 
@@ -44,37 +36,22 @@ npm run dev
 
 # Build for production
 npm run build
-
-# Start production server
-npm start
 ```
 
-## 📝 API Routes
+## Setup
 
-- `/api/webhook/vercel` - Vercel deployment webhooks
-- `/api/webhook/netlify` - Netlify deployment webhooks
-- `/api/webhook/generic` - Generic webhook handler for Railway and others
+1. Add your webhook URL to your deployment platform
+2. Configure your notification channel (Slack/Discord/Email)
+3. Deploy and get notified!
 
-## 🎨 Design
+## Deployment
 
-- Clean, modern dark mode interface
-- Orange/amber accent colors (alert-themed)
-- Glass morphism cards with smooth animations
-- Fully responsive design
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/deploybeep)
 
-## 📊 Pricing
+## Live Demo
 
-- **Free**: 100 notifications/month
-- **Pro ($12/mo)**: Unlimited notifications + custom templates + analytics
+🔗 [deploybeep.vercel.app](https://deploybeep.vercel.app)
 
-## 🤝 Contributing
-
-This is a hackathon MVP. Contributions welcome!
-
-## 📄 License
+## License
 
 MIT
-
----
-
-Built with ⚡ by [Tahseen](https://github.com/tahseen137)
