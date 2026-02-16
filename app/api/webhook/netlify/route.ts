@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sendNotifications, type NotificationData } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,11 +16,12 @@ export async function POST(request: NextRequest) {
     const isFailed = state === 'error' || state === 'failed';
     
     // Format notification message
-    const notification = {
+    const notification: NotificationData = {
       platform: 'Netlify',
       status: isSuccess ? 'SUCCESS' : isFailed ? 'FAILED' : 'IN_PROGRESS',
       timestamp: new Date().toISOString(),
       data: {
+        project: payload.name || 'Unknown Site',
         site: payload.name || 'Unknown Site',
         url: deployUrl,
         environment: context,
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest) {
         state: state,
       },
       notification: {
-        title: `◆ Netlify Deploy ${isSuccess ? '✅ Successful' : isFailed ? '❌ Failed' : '⏳ Building'}`,
+        title: `Netlify Deploy ${isSuccess ? 'Successful' : isFailed ? 'Failed' : 'Building'}`,
         message: `${payload.name || 'Site'} deployed to ${context}`,
         color: isSuccess ? '#00C853' : isFailed ? '#D32F2F' : '#FFA726',
         fields: [
@@ -50,36 +52,32 @@ export async function POST(request: NextRequest) {
       state: state,
     });
     
-    // Check for notification channels
+    // Get notification targets from query params
     const slackWebhook = request.nextUrl.searchParams.get('slack');
     const discordWebhook = request.nextUrl.searchParams.get('discord');
     const email = request.nextUrl.searchParams.get('email');
     
-    if (slackWebhook) {
-      console.log('📨 Would send to Slack:', slackWebhook);
-    }
-    if (discordWebhook) {
-      console.log('📨 Would send to Discord:', discordWebhook);
-    }
-    if (email) {
-      console.log('📨 Would send email to:', email);
-    }
+    // Send notifications to configured targets
+    const results = await sendNotifications(
+      {
+        slack: slackWebhook || undefined,
+        discord: discordWebhook || undefined,
+        email: email || undefined,
+      },
+      notification
+    );
     
     return NextResponse.json({
       success: true,
-      message: 'Webhook received and processed',
+      message: 'Webhook received and notifications sent',
       notification,
-      debug: {
-        slackConfigured: !!slackWebhook,
-        discordConfigured: !!discordWebhook,
-        emailConfigured: !!email,
-      },
+      deliveryResults: results,
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error processing Netlify webhook:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to process webhook' },
+      { success: false, error: error.message || 'Failed to process webhook' },
       { status: 500 }
     );
   }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { sendNotifications, type NotificationData } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +15,7 @@ export async function POST(request: NextRequest) {
     );
     
     // Format notification message with generic fields
-    const notification = {
+    const notification: NotificationData = {
       platform: 'Generic',
       status: isSuccess ? 'SUCCESS' : isFailed ? 'FAILED' : 'IN_PROGRESS',
       timestamp: new Date().toISOString(),
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
         status: status,
       },
       notification: {
-        title: `🚂 Deploy ${isSuccess ? '✅ Successful' : isFailed ? '❌ Failed' : '⏳ In Progress'}`,
+        title: `Deploy ${isSuccess ? 'Successful' : isFailed ? 'Failed' : 'In Progress'}`,
         message: `${payload.project || payload.name || 'Project'} deployment ${status}`,
         color: isSuccess ? '#00C853' : isFailed ? '#D32F2F' : '#FFA726',
         fields: [
@@ -37,7 +38,6 @@ export async function POST(request: NextRequest) {
           { name: 'Branch', value: payload.branch || 'main', inline: true },
         ],
       },
-      raw: payload, // Include raw payload for debugging
     };
     
     // Log for debugging
@@ -47,37 +47,35 @@ export async function POST(request: NextRequest) {
       rawPayload: Object.keys(payload),
     });
     
-    // Check for notification channels
+    // Get notification targets from query params
     const slackWebhook = request.nextUrl.searchParams.get('slack');
     const discordWebhook = request.nextUrl.searchParams.get('discord');
     const email = request.nextUrl.searchParams.get('email');
     
-    if (slackWebhook) {
-      console.log('📨 Would send to Slack:', slackWebhook);
-    }
-    if (discordWebhook) {
-      console.log('📨 Would send to Discord:', discordWebhook);
-    }
-    if (email) {
-      console.log('📨 Would send email to:', email);
-    }
+    // Send notifications to configured targets
+    const results = await sendNotifications(
+      {
+        slack: slackWebhook || undefined,
+        discord: discordWebhook || undefined,
+        email: email || undefined,
+      },
+      notification
+    );
     
     return NextResponse.json({
       success: true,
-      message: 'Generic webhook received and processed',
+      message: 'Generic webhook received and notifications sent',
       notification,
+      deliveryResults: results,
       debug: {
-        slackConfigured: !!slackWebhook,
-        discordConfigured: !!discordWebhook,
-        emailConfigured: !!email,
         payloadKeys: Object.keys(payload),
       },
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error processing generic webhook:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to process webhook' },
+      { success: false, error: error.message || 'Failed to process webhook' },
       { status: 500 }
     );
   }
